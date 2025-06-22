@@ -100,6 +100,7 @@ const Index = () => {
         open={menuOpen}
         onOpenChange={setMenuOpen}
         onNavigateToSettings={() => navigate("/settings")}
+        onNavigateToAnalyses={() => navigate("/analyses")}
         onNavigateToHome={() => {
           setAppState("home");
           setSelectedBook(null);

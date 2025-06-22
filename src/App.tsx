@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import BibleBooks from "./pages/BibleBooks";
 import Settings from "./pages/Settings";
+import SavedAnalyses from "./pages/SavedAnalyses";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/books" element={<BibleBooks />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/analyses" element={<SavedAnalyses />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

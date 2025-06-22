@@ -1,4 +1,4 @@
-import { Settings, Book, Home, Info, HelpCircle } from "lucide-react";
+import { Settings, Book, Home, Info, HelpCircle, FileText } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -15,6 +15,7 @@ interface MenuDrawerProps {
   onNavigateToSettings?: () => void;
   onNavigateToHome?: () => void;
   onNavigateToBooks?: () => void;
+  onNavigateToAnalyses?: () => void;
 }
 
 const MenuDrawer = ({
@@ -23,6 +24,7 @@ const MenuDrawer = ({
   onNavigateToSettings,
   onNavigateToHome,
   onNavigateToBooks,
+  onNavigateToAnalyses,
 }: MenuDrawerProps) => {
   const menuItems = [
     {
@@ -38,6 +40,14 @@ const MenuDrawer = ({
       icon: Book,
       onClick: () => {
         onNavigateToBooks?.();
+        onOpenChange?.(false);
+      },
+    },
+    {
+      label: "Análises Salvas",
+      icon: FileText,
+      onClick: () => {
+        onNavigateToAnalyses?.();
         onOpenChange?.(false);
       },
     },

@@ -37,9 +37,9 @@ const VerseCard = ({
       className={cn(
         "border-l-3 bg-white/80 backdrop-blur-sm transition-all duration-200",
         isSelected
-          ? "border-l-blue-500 bg-blue-50/50 shadow-md"
-          : "border-l-sage-300 hover:shadow-md",
-        onSelect && "cursor-pointer",
+          ? "border-l-blue-500 bg-blue-50/70 shadow-lg ring-2 ring-blue-200"
+          : "border-l-sage-300 hover:shadow-md hover:bg-white/90",
+        onSelect && "cursor-pointer select-none active:scale-[0.98]",
         className,
       )}
       onClick={handleClick}
@@ -78,13 +78,16 @@ const VerseCard = ({
               </div>
             )}
             {isSelected && (
-              <div className="mt-2">
+              <div className="mt-3 flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="bg-blue-100 text-blue-700 text-xs"
+                  className="bg-blue-100 text-blue-700 text-xs font-medium"
                 >
-                  Selecionado
+                  ✓ Selecionado
                 </Badge>
+                <span className="text-xs text-blue-600">
+                  Toque novamente para desmarcar
+                </span>
               </div>
             )}
           </div>
