@@ -3,7 +3,12 @@ import { Bot, Settings, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import AISettings from "./AISettings";
 
 interface AIHelperProps {
@@ -75,6 +80,9 @@ const AIHelper = ({ currentVerse, currentBook, chapter }: AIHelperProps) => {
               </Button>
             </DialogTrigger>
             <DialogContent className="p-0 border-none">
+              <DialogTitle className="sr-only">
+                Configurações do Assistente IA
+              </DialogTitle>
               <AISettings onClose={() => setShowSettings(false)} />
             </DialogContent>
           </Dialog>
