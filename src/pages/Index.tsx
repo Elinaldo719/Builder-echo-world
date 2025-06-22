@@ -1,40 +1,60 @@
+import { useState } from "react";
+import { BibleBook } from "@/types/bible";
+import BibleHeader from "@/components/BibleHeader";
+import DailyVerse from "@/components/DailyVerse";
+import BooksList from "@/components/BooksList";
+import ChapterReader from "@/components/ChapterReader";
+
+type AppState = "home" | "books" | "reading";
+
 const Index = () => {
+  const [appState, setAppState] = useState<AppState>("home");
+  const [selectedBook, setSelectedBook] = useState<BibleBook | null>(null);
+  const [dailyVerseKey, setDailyVerseKey] = useState(0);
+
+  const handleBookSelect = (book: BibleBook) => {
+    setSelectedBook(book);
+    setAppState("reading");
+  };
+
+  const handleRandomVerse = () => {
+    setDailyVerseKey((prev) => prev + 1);
+    setAppState("home");
+  };
+
+  const handleBackToBooks = () => {
+    setAppState("home");
+    setSelectedBook(null);
+  };
+
+  const handleMenuClick = () => {
+    if (appState === "home") {
+      setAppState("books");
+    } else {
+      setAppState("home");
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
+    <div className="min-h-screen bg-gray-50">
+      <BibleHeader
+        onRandomVerse={handleRandomVerse}
+        onMenuClick={handleMenuClick}
+      />
+
+      <div className="px-4 py-6 max-w-4xl mx-auto">
+        {appState === "home" && (
+          <div className="space-y-6">
+            <DailyVerse key={dailyVerseKey} onRefresh={handleRandomVerse} />
+            <BooksList onBookSelect={handleBookSelect} />
+          </div>
+        )}
+
+        {appState === "books" && <BooksList onBookSelect={handleBookSelect} />}
+
+        {appState === "reading" && selectedBook && (
+          <ChapterReader book={selectedBook} onBack={handleBackToBooks} />
+        )}
       </div>
     </div>
   );
