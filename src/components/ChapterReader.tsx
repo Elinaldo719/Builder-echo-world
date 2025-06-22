@@ -24,6 +24,8 @@ interface ChapterReaderProps {
   initialChapter?: number;
   version?: string;
   onBack?: () => void;
+  onVerseSelect?: (verse: any, book?: any, chapter?: number) => void;
+  isVerseSelected?: (verse: any, chapter?: number) => boolean;
 }
 
 const ChapterReader = ({
@@ -31,6 +33,8 @@ const ChapterReader = ({
   initialChapter = 1,
   version = "nvi",
   onBack,
+  onVerseSelect,
+  isVerseSelected,
 }: ChapterReaderProps) => {
   const [currentChapter, setCurrentChapter] = useState(initialChapter);
 
@@ -138,8 +142,14 @@ const ChapterReader = ({
                 verse={verse}
                 book={chapterData.book}
                 chapter={chapterData.chapter.number}
+                onSelect={onVerseSelect}
+                isSelected={isVerseSelected?.(
+                  verse,
+                  chapterData.chapter.number,
+                )}
               />
             ))}
+        ;
       </div>
 
       {/* Navigation Progress Bar */}

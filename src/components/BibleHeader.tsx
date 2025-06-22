@@ -4,9 +4,14 @@ import { Button } from "@/components/ui/button";
 interface BibleHeaderProps {
   onRandomVerse?: () => void;
   onMenuClick?: () => void;
+  hideMenuButton?: boolean;
 }
 
-const BibleHeader = ({ onRandomVerse, onMenuClick }: BibleHeaderProps) => {
+const BibleHeader = ({
+  onRandomVerse,
+  onMenuClick,
+  hideMenuButton,
+}: BibleHeaderProps) => {
   return (
     <header className="subtle-gradient text-neutral-700 px-6 py-5 border-b border-neutral-200/50">
       <div className="flex items-center justify-between max-w-4xl mx-auto">
@@ -25,14 +30,16 @@ const BibleHeader = ({ onRandomVerse, onMenuClick }: BibleHeaderProps) => {
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onMenuClick}
-            className="text-neutral-600 hover:bg-white/50 hover:text-neutral-700 rounded-lg transition-all duration-200"
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
+          {!hideMenuButton && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onMenuClick}
+              className="text-neutral-600 hover:bg-white/50 hover:text-neutral-700 rounded-lg transition-all duration-200"
+            >
+              <Menu className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </header>
