@@ -4,6 +4,7 @@ import BibleHeader from "@/components/BibleHeader";
 import DailyVerse from "@/components/DailyVerse";
 import BooksList from "@/components/BooksList";
 import ChapterReader from "@/components/ChapterReader";
+import AIHelper from "@/components/AIHelper";
 
 type AppState = "home" | "books" | "reading";
 
@@ -46,6 +47,7 @@ const Index = () => {
         {appState === "home" && (
           <div className="space-y-6">
             <DailyVerse key={dailyVerseKey} onRefresh={handleRandomVerse} />
+            <AIHelper currentBook="Estudo Bíblico" />
             <BooksList onBookSelect={handleBookSelect} />
           </div>
         )}
