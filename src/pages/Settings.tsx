@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Key, MessageSquare, Info } from "lucide-react";
 import BibleHeader from "@/components/BibleHeader";
+import AISettings from "@/components/AISettings";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,14 +11,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 
-interface SettingsProps {
-  onBack?: () => void;
-}
-
-const Settings = ({ onBack }: SettingsProps) => {
+const Settings = () => {
+  const navigate = useNavigate();
   const [apiKey, setApiKey] = useState("");
   const [customPrompt, setCustomPrompt] = useState("");
   const { toast } = useToast();
+
+  const handleBack = () => {
+    navigate("/");
+  };
 
   useEffect(() => {
     // Carregar configurações salvas
@@ -77,7 +80,7 @@ const Settings = ({ onBack }: SettingsProps) => {
 
   return (
     <div className="min-h-screen modern-gradient">
-      <BibleHeader onMenuClick={onBack} />
+      <BibleHeader onMenuClick={handleBack} hideMenuButton={true} />
 
       <div className="px-6 py-8 max-w-4xl mx-auto">
         <div className="space-y-6">
@@ -86,7 +89,7 @@ const Settings = ({ onBack }: SettingsProps) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={onBack}
+              onClick={handleBack}
               className="text-neutral-600 hover:text-neutral-700 hover:bg-sage-50 rounded-lg"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -94,6 +97,11 @@ const Settings = ({ onBack }: SettingsProps) => {
             <h1 className="text-2xl font-medium text-neutral-700 tracking-tight">
               Configurações
             </h1>
+          </div>
+
+          {/* AI Model Settings */}
+          <div className="flex justify-center">
+            <AISettings />
           </div>
 
           {/* API Configuration */}

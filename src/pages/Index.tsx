@@ -5,7 +5,7 @@ import BibleHeader from "@/components/BibleHeader";
 import DailyVerse from "@/components/DailyVerse";
 import BooksList from "@/components/BooksList";
 import ChapterReader from "@/components/ChapterReader";
-import AIHelper from "@/components/AIHelper";
+
 import MenuDrawer from "@/components/MenuDrawer";
 import VerseAnalysis from "@/components/VerseAnalysis";
 import { Button } from "@/components/ui/button";
@@ -151,7 +151,6 @@ const Index = () => {
         {appState === "home" && (
           <div className="space-y-6">
             <DailyVerse key={dailyVerseKey} onRefresh={handleRandomVerse} />
-            <AIHelper currentBook="Estudo Bíblico" />
             <BooksList onBookSelect={handleBookSelect} />
           </div>
         )}
