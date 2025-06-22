@@ -21,13 +21,13 @@ const SearchBar = ({
 
   return (
     <div className={cn("relative", className)}>
-      <IconComponent className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <IconComponent className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
       <Input
         type="text"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
-        className="pl-10 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
+        className="pl-10 bg-white border-neutral-200 focus:border-sage-300 focus:ring-sage-100 rounded-lg transition-all duration-200 text-neutral-700 placeholder:text-neutral-400"
       />
     </div>
   );

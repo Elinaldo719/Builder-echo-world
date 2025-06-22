@@ -72,42 +72,44 @@ const ChapterReader = ({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <Card className="border-l-4 border-l-primary">
-        <CardHeader className="pb-3">
+      <Card className="border-l-3 border-l-sage-300 bg-white/80 backdrop-blur-sm">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onBack}
-                className="text-gray-600 hover:text-gray-800"
+                className="text-neutral-600 hover:text-neutral-700 hover:bg-sage-50 rounded-lg transition-all duration-200"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <Book className="h-5 w-5" />
+                <h2 className="text-lg font-medium text-neutral-700 flex items-center gap-2 tracking-tight">
+                  <div className="p-1.5 bg-sage-100 rounded-md">
+                    <Book className="h-4 w-4 text-sage-600" />
+                  </div>
                   Estudo da Bíblia
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-3 w-3 text-neutral-400" />
                 </h2>
-                <p className="text-sm text-gray-600">
-                  {book.name} - Capítulo {currentChapter} -{" "}
+                <p className="text-sm text-neutral-500 mt-1">
+                  {book.name} - Capítulo {currentChapter} •{" "}
                   {version.toUpperCase()}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-600 hover:text-gray-800"
+                className="text-neutral-600 hover:text-neutral-700 hover:bg-sage-50 rounded-lg transition-all duration-200"
               >
                 <Bookmark className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-600 hover:text-gray-800"
+                className="text-neutral-600 hover:text-neutral-700 hover:bg-sage-50 rounded-lg transition-all duration-200"
               >
                 <Share2 className="h-4 w-4" />
               </Button>
@@ -133,21 +135,24 @@ const ChapterReader = ({
       </div>
 
       {/* Navigation Progress Bar */}
-      <Card className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t">
+      <Card className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-neutral-200/50">
         <CardContent className="p-4">
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-6">
             <Button
               variant="ghost"
               size="icon"
               onClick={handlePrevious}
               disabled={!canGoPrevious}
-              className="rounded-full"
+              className="rounded-full bg-sage-50 hover:bg-sage-100 text-sage-600 disabled:bg-neutral-100 disabled:text-neutral-400 transition-all duration-200"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
+              <Badge
+                variant="outline"
+                className="text-xs bg-white border-neutral-200 text-neutral-600 px-3 py-1"
+              >
                 {currentChapter} / {book.chapters}
               </Badge>
             </div>
@@ -157,27 +162,33 @@ const ChapterReader = ({
               size="icon"
               onClick={handleNext}
               disabled={!canGoNext}
-              className="rounded-full"
+              className="rounded-full bg-sage-50 hover:bg-sage-100 text-sage-600 disabled:bg-neutral-100 disabled:text-neutral-400 transition-all duration-200"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-3">
+      <div className="fixed bottom-6 right-6 flex flex-col gap-3">
         <Button
           size="icon"
           onClick={scrollToTop}
-          className="rounded-full purple-gradient shadow-lg"
+          className="rounded-full bg-white/90 hover:bg-sage-50 text-sage-600 shadow-lg border border-neutral-200/50 backdrop-blur-sm transition-all duration-200"
         >
           <ArrowUp className="h-4 w-4" />
         </Button>
-        <Button size="icon" className="rounded-full purple-gradient shadow-lg">
+        <Button
+          size="icon"
+          className="rounded-full bg-white/90 hover:bg-sage-50 text-sage-600 shadow-lg border border-neutral-200/50 backdrop-blur-sm transition-all duration-200"
+        >
           <Book className="h-4 w-4" />
         </Button>
-        <Button size="icon" className="rounded-full purple-gradient shadow-lg">
+        <Button
+          size="icon"
+          className="rounded-full bg-white/90 hover:bg-sage-50 text-sage-600 shadow-lg border border-neutral-200/50 backdrop-blur-sm transition-all duration-200"
+        >
           <Share2 className="h-4 w-4" />
         </Button>
       </div>

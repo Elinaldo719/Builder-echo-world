@@ -9,9 +9,9 @@ interface BibleBooksProps {
 
 const BibleBooks = ({ onBookSelect, onRandomVerse }: BibleBooksProps) => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen modern-gradient">
       <BibleHeader onRandomVerse={onRandomVerse} />
-      <div className="px-4 py-6">
+      <div className="px-6 py-8 max-w-4xl mx-auto">
         <BooksList onBookSelect={onBookSelect} />
       </div>
     </div>

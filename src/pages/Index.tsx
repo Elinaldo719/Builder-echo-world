@@ -36,13 +36,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen modern-gradient">
       <BibleHeader
         onRandomVerse={handleRandomVerse}
         onMenuClick={handleMenuClick}
       />
 
-      <div className="px-4 py-6 max-w-4xl mx-auto">
+      <div className="px-6 py-8 max-w-4xl mx-auto">
         {appState === "home" && (
           <div className="space-y-6">
             <DailyVerse key={dailyVerseKey} onRefresh={handleRandomVerse} />
