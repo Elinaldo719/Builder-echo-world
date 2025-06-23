@@ -31,7 +31,7 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
 
     const analysisData = {
       id: Date.now().toString(),
-      title: `Estudo de ${selectedVerses.length} versículo${selectedVerses.length > 1 ? "s" : ""}`,
+      title: `Estudo de ${selectedVerses.length} versículo${selectedVerses.length > 1 ? 's' : ''}`,
       verses: selectedVerses.map(({ verse, book, chapter }) => ({
         text: verse.text,
         reference: `${book.name} ${chapter}:${verse.number}`,
@@ -41,9 +41,7 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
     };
 
     // Salvar no localStorage
-    const existingAnalyses = JSON.parse(
-      localStorage.getItem("saved_analyses") || "[]",
-    );
+    const existingAnalyses = JSON.parse(localStorage.getItem("saved_analyses") || "[]");
     existingAnalyses.unshift(analysisData); // Adiciona no início da lista
     localStorage.setItem("saved_analyses", JSON.stringify(existingAnalyses));
 
@@ -59,13 +57,14 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
     try {
       // Obter configurações salvas
       const apiKey = localStorage.getItem("gemini_api_key");
-      const customPrompt =
-        localStorage.getItem("gemini_custom_prompt") ||
+      const customPrompt = localStorage.getItem("gemini_custom_prompt") ||
         "Analise os versículos bíblicos fornecidos considerando contexto histórico, significado teológico e aplicação prática.";
 
-      const aiSettings = JSON.parse(
-        localStorage.getItem("ai_model_settings") || "{}",
-      );
+      const aiSettings = JSON.parse(localStorage.getItem("ai_model_settings") || "{}");
+
+      console.log('API Key presente:', !!apiKey);
+      console.log('Configurações AI:', aiSettings);
+      console.log('Prompt personalizado:', customPrompt);
 
       // Preparar versículos para análise
       const versesText = selectedVerses
@@ -83,58 +82,45 @@ ${versesText}
 
 Por favor, forneça uma análise detalhada e bem estruturada destes versículos.`;
 
-      if (apiKey && apiKey.trim()) {
+      // Validar chave da API
+      if (apiKey && apiKey.trim() && apiKey.length > 10) {
         // Fazer chamada real para a API do Gemini
         try {
           // Corrigir o nome do modelo
-          const modelName =
-            aiSettings.model === "gemini-2.5-flash"
-              ? "gemini-1.5-flash"
-              : aiSettings.model === "gemini-1.5-pro"
-                ? "gemini-1.5-pro"
-                : aiSettings.model === "gemini-1.0-pro"
-                  ? "gemini-1.0-pro"
-                  : "gemini-1.5-flash";
+          const modelName = aiSettings.model === 'gemini-2.5-flash' ? 'gemini-1.5-flash' :
+                           aiSettings.model === 'gemini-1.5-pro' ? 'gemini-1.5-pro' :
+                           aiSettings.model === 'gemini-1.0-pro' ? 'gemini-1.0-pro' :
+                           'gemini-1.5-flash';
 
-          console.log("Fazendo chamada para Gemini API:", modelName);
+          console.log('Fazendo chamada para Gemini API:', modelName);
 
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      {
-                        text: fullPrompt,
-                      },
-                    ],
-                  },
-                ],
-                generationConfig: {
-                  temperature: aiSettings.temperature
-                    ? aiSettings.temperature[0]
-                    : 1,
-                  maxOutputTokens: 4096,
-                  topP: 0.95,
-                  topK: 64,
-                },
-              }),
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
             },
-          );
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: fullPrompt
+                }]
+              }],
+              generationConfig: {
+                temperature: aiSettings.temperature ? aiSettings.temperature[0] : 1,
+                maxOutputTokens: 4096,
+                topP: 0.95,
+                topK: 64,
+              }
+            })
+          });
 
-          console.log("Resposta da API:", response.status);
+          console.log('Resposta da API:', response.status);
 
           if (response.ok) {
             const data = await response.json();
-            console.log("Dados recebidos:", data);
+            console.log('Dados recebidos:', data);
 
-            const generatedText =
-              data.candidates?.[0]?.content?.parts?.[0]?.text;
+            const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (generatedText) {
               // Remove asteriscos e formata o texto
@@ -157,12 +143,32 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
           }
         } catch (apiError) {
           console.error("Erro na API do Gemini:", apiError);
+          let errorMessage = "Erro desconhecido na API";
+
+          if (apiError.message.includes("403")) {
+            errorMessage = "Chave da API inválida ou sem permissão";
+          } else if (apiError.message.includes("400")) {
+            errorMessage = "Requisição inválida - verifique as configurações";
+          } else if (apiError.message.includes("429")) {
+            errorMessage = "Limite de uso excedido - tente novamente mais tarde";
+          } else if (apiError.message.includes("Failed to fetch")) {
+            errorMessage = "Erro de conexão - verifique sua internet";
+          }
+
           toast({
             title: "Erro na API do Gemini",
-            description: `${apiError.message}. Verifique sua chave da API.`,
+            description: errorMessage,
             variant: "destructive",
           });
         }
+      } else {
+        // Sem API key válida
+        toast({
+          title: "API key necessária",
+          description: "Configure uma chave da API do Gemini válida nas configurações.",
+          variant: "destructive",
+        });
+      }
       }
 
       // Fallback: Análise local melhorada baseada no prompt personalizado
@@ -201,10 +207,10 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
 
         toast({
           title: "Análise local concluída",
-          description:
-            "Configure a API do Gemini para análises mais detalhadas.",
+          description: "Configure a API do Gemini para análises mais detalhadas.",
         });
       }, 2000);
+
     } catch (error) {
       console.error("Erro na análise:", error);
       toast({
@@ -302,27 +308,22 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
               {/* Status das configurações */}
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="flex items-center gap-1">
-                  <div
-                    className={`w-2 h-2 rounded-full ${hasApiKey ? "bg-green-500" : "bg-red-500"}`}
-                  ></div>
+                  <div className={`w-2 h-2 rounded-full ${hasApiKey ? 'bg-green-500' : 'bg-red-500'}`}></div>
                   <span className="text-xs text-neutral-500">
-                    API Key {hasApiKey ? "✓" : "✗"}
+                    API Key {hasApiKey ? '✓' : '✗'}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div
-                    className={`w-2 h-2 rounded-full ${hasCustomPrompt ? "bg-green-500" : "bg-yellow-500"}`}
-                  ></div>
+                  <div className={`w-2 h-2 rounded-full ${hasCustomPrompt ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
                   <span className="text-xs text-neutral-500">
-                    Prompt {hasCustomPrompt ? "Personalizado" : "Padrão"}
+                    Prompt {hasCustomPrompt ? 'Personalizado' : 'Padrão'}
                   </span>
                 </div>
               </div>
 
               {!hasApiKey && (
                 <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-md mb-2">
-                  ⚠️ Configure sua API key do Gemini nas configurações para
-                  análises mais detalhadas
+                  ⚠️ Configure sua API key do Gemini nas configurações para análises mais detalhadas
                 </p>
               )}
             </div>
@@ -332,7 +333,7 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
               className="bg-blue-500 hover:bg-blue-600 text-white px-6"
             >
               <Send className="h-4 w-4 mr-2" />
-              {hasApiKey ? "Analisar com Gemini" : "Análise Local"}
+              {hasApiKey ? 'Analisar com Gemini' : 'Análise Local'}
             </Button>
           </div>
         )}
