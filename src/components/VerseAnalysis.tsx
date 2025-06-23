@@ -52,13 +52,18 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
 
-    // Obter prompt personalizado das configurações
-    const customPrompt =
-      localStorage.getItem("gemini_custom_prompt") ||
-      "Analise os versículos bíblicos fornecidos considerando contexto histórico, significado teológico e aplicação prática.";
+    try {
+      // Obter configurações salvas
+      const apiKey = localStorage.getItem("gemini_api_key");
+      const customPrompt =
+        localStorage.getItem("gemini_custom_prompt") ||
+        "Analise os versículos bíblicos fornecidos considerando contexto histórico, significado teológico e aplicação prática.";
 
-    // Simular análise da IA (substituir por chamada real da API)
-    setTimeout(() => {
+      const aiSettings = JSON.parse(
+        localStorage.getItem("ai_model_settings") || "{}",
+      );
+
+      // Preparar versículos para análise
       const versesText = selectedVerses
         .map(
           ({ verse, book, chapter }) =>
@@ -66,40 +71,102 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
         )
         .join("\n\n");
 
-      const mockAnalysis = `**Análise dos Versículos Selecionados**
+      // Construir prompt completo
+      const fullPrompt = `${customPrompt}
 
-**Versículos Analisados:**
+VERSÍCULOS PARA ANÁLISE:
 ${versesText}
 
-**Contexto Histórico:**
-Estes versículos fazem parte de uma passagem fundamental que revela aspectos importantes da fé cristã. O contexto histórico mostra como essas palavras foram direcionadas ao povo em um momento específico de sua jornada espiritual.
+Por favor, forneça uma análise detalhada e bem estruturada destes versículos.`;
 
-**Significado Teológico:**
-A mensagem central dessas escrituras aponta para:
-- A soberania e fidelidade de Deus
-- A importância da confiança nas promessas divinas
-- O relacionamento íntimo entre Deus e seu povo
+      if (apiKey && apiKey.trim()) {
+        // Fazer chamada real para a API do Gemini
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${aiSettings.model || "gemini-2.5-flash"}:generateContent?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [
+                      {
+                        text: fullPrompt,
+                      },
+                    ],
+                  },
+                ],
+                generationConfig: {
+                  temperature: aiSettings.temperature
+                    ? aiSettings.temperature[0]
+                    : 1,
+                  maxOutputTokens: 2048,
+                },
+              }),
+            },
+          );
 
-**Aplicação Prática:**
-Para os dias de hoje, estes versículos nos ensinam sobre:
-- A importância da perseverança na fé diária
-- Como aplicar os princípios bíblicos na vida cotidiana
-- O valor da meditação constante nas escrituras
-- A necessidade de confiar em Deus em tempos difíceis
+          if (response.ok) {
+            const data = await response.json();
+            const generatedText =
+              data.candidates?.[0]?.content?.parts?.[0]?.text ||
+              "Não foi possível gerar a análise.";
 
-**Conexões Bíblicas:**
-Estes versículos se relacionam com outras passagens que abordam temas similares de fé, esperança e confiança em Deus, formando um rico tecido teológico através das escrituras.
+            // Remove asteriscos e formata o texto
+            const cleanAnalysis = generatedText.replace(/\*/g, "");
+            setAnalysis(cleanAnalysis);
+            setIsAnalyzing(false);
+            return;
+          } else {
+            throw new Error(`Erro da API: ${response.status}`);
+          }
+        } catch (apiError) {
+          console.error("Erro na API do Gemini:", apiError);
+          toast({
+            title: "Erro na API",
+            description:
+              "Não foi possível conectar com o Gemini. Usando análise local.",
+            variant: "destructive",
+          });
+        }
+      }
 
-**Reflexão Pessoal:**
-Como você pode aplicar essas verdades em sua vida hoje? Considere maneiras práticas de viver esses princípios em seu dia a dia.
+      // Fallback: Análise local melhorada baseada no prompt personalizado
+      setTimeout(() => {
+        const analysisTemplate = `Análise dos Versículos Selecionados
 
-Análise gerada pelo assistente IA Gemini`;
+Versículos Analisados:
+${versesText}
 
-      // Remove asteriscos do texto final
-      const cleanAnalysis = mockAnalysis.replace(/\*/g, "");
-      setAnalysis(cleanAnalysis);
+Baseado no prompt personalizado: "${customPrompt}"
+
+Esta análise foi gerada localmente pois não foi possível conectar com a API do Gemini.
+Para obter análises mais detalhadas e personalizadas, verifique:
+- Se sua chave da API está correta nas configurações
+- Se você tem conexão com a internet
+- Se as configurações do modelo estão adequadas
+
+Análise básica dos versículos:
+Os versículos selecionados contêm ensinamentos importantes que podem ser aplicados em nossa vida diária.
+Cada passagem carrega significado teológico e histórico que merece reflexão cuidadosa.
+
+Configure sua chave da API do Gemini nas configurações para análises mais profundas e personalizadas.`;
+
+        setAnalysis(analysisTemplate);
+        setIsAnalyzing(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Erro na análise:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível realizar a análise. Tente novamente.",
+        variant: "destructive",
+      });
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   return (
