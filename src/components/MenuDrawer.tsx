@@ -82,7 +82,7 @@ const MenuDrawer = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-80 bg-white/95 backdrop-blur-sm border-neutral-200/50"
+        className="w-72 sm:w-80 bg-white/95 backdrop-blur-sm border-neutral-200/50"
       >
         <SheetHeader className="pb-6">
           <div className="flex items-center gap-3">
