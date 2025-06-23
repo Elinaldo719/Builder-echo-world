@@ -150,7 +150,7 @@ const SavedAnalyses = () => {
     <div className="min-h-screen modern-gradient">
       <BibleHeader onMenuClick={handleBack} hideMenuButton={true} />
 
-      <div className="px-6 py-8 pb-24 max-w-4xl mx-auto">
+      <div className="px-4 py-8 pb-24 max-w-none mx-auto">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-4">

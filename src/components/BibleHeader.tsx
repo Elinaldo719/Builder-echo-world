@@ -14,7 +14,7 @@ const BibleHeader = ({
 }: BibleHeaderProps) => {
   return (
     <header className="subtle-gradient text-neutral-700 px-6 py-5 border-b border-neutral-200/50">
-      <div className="flex items-center justify-between max-w-4xl mx-auto">
+      <div className="flex items-center justify-between max-w-none mx-auto px-2">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white/70 rounded-lg shadow-sm">
             <Book className="h-5 w-5 text-sage-600" />

@@ -109,7 +109,7 @@ const Index = () => {
         onNavigateToBooks={() => setAppState("books")}
       />
 
-      <div className="px-6 py-8 max-w-4xl mx-auto">
+      <div className="px-4 py-8 max-w-none mx-auto">
         {/* Selected Verses Analysis Bar */}
         {selectedVerses.length > 0 && !showAnalysis && (
           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
