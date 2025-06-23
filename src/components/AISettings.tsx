@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { X, Settings, ChevronDown, Edit } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Settings, ChevronDown, Edit, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,8 +36,60 @@ const AISettings = ({ onClose }: AISettingsProps) => {
   const [functionCalling, setFunctionCalling] = useState(false);
   const [googleSearch, setGoogleSearch] = useState(true);
   const [urlContext, setUrlContext] = useState(false);
+  const { toast } = useToast();
 
   const tokenCount = "0 / 1.048.576";
+
+  // Carregar configurações salvas
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("ai_model_settings");
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        setModel(settings.model || "gemini-2.5-flash");
+        setTemperature(settings.temperature || [1]);
+        setThinkingMode(settings.thinkingMode ?? true);
+        setThinkingBudget(settings.thinkingBudget ?? false);
+        setStructuredOutput(settings.structuredOutput ?? false);
+        setCodeExecution(settings.codeExecution ?? false);
+        setFunctionCalling(settings.functionCalling ?? false);
+        setGoogleSearch(settings.googleSearch ?? true);
+        setUrlContext(settings.urlContext ?? false);
+      } catch (error) {
+        console.error("Erro ao carregar configurações da IA:", error);
+      }
+    }
+  }, []);
+
+  // Função para salvar configurações
+  const handleSave = () => {
+    const settings = {
+      model,
+      temperature,
+      thinkingMode,
+      thinkingBudget,
+      structuredOutput,
+      codeExecution,
+      functionCalling,
+      googleSearch,
+      urlContext,
+      savedAt: new Date().toISOString(),
+    };
+
+    try {
+      localStorage.setItem("ai_model_settings", JSON.stringify(settings));
+      toast({
+        title: "Configurações salvas!",
+        description: `Modelo ${model} e configurações foram salvos com sucesso.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar as configurações.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm border-neutral-200/50 shadow-lg">
@@ -228,7 +281,11 @@ const AISettings = ({ onClose }: AISettingsProps) => {
 
         {/* Save Button */}
         <div className="pt-4">
-          <Button className="w-full subtle-gradient text-neutral-700 hover:bg-sage-100 border border-neutral-200">
+          <Button
+            onClick={handleSave}
+            className="w-full bg-sage-500 hover:bg-sage-600 text-white transition-all duration-200"
+          >
+            <Save className="h-4 w-4 mr-2" />
             Salvar Configurações
           </Button>
         </div>
