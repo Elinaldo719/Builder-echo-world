@@ -8,6 +8,103 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { BibleVerse, BibleBookInfo } from "@/types/bible";
 
+// Função para formatar o texto da análise de forma profissional
+const formatAnalysisText = (text: string) => {
+  // Remove asteriscos, hashtags e tags markdown
+  let cleanText = text
+    .replace(/\*\*/g, "") // Remove **
+    .replace(/\*/g, "") // Remove *
+    .replace(/###/g, "") // Remove ###
+    .replace(/##/g, "") // Remove ##
+    .replace(/#/g, "") // Remove #
+    .replace(/\[.*?\]/g, "") // Remove tags [texto]
+    .replace(/<.*?>/g, "") // Remove tags HTML
+    .trim();
+
+  // Quebra o texto em seções
+  const sections = cleanText.split(/\n\s*\n/);
+
+  return sections.map((section, index) => {
+    const trimmed = section.trim();
+    if (!trimmed) return null;
+
+    // Identifica títulos principais (palavras em MAIÚSCULA ou títulos comuns)
+    if (
+      trimmed.match(/^[A-ZÀ-Ù\s]{3,}:?\s*$/) ||
+      trimmed.match(/^(ANÁLISE|CONTEXTO|SIGNIFICADO|APLICAÇÃO|CONEXÕES|REFLEXÃO|VERSÍCULOS|CONCLUSÃO)/i)
+    ) {
+      return (
+        <div key={index} className="mb-6 first:mt-0">
+          <h2 className="text-xl font-bold text-blue-700 mb-3 pb-2 border-b-2 border-blue-200">
+            {trimmed.replace(/:/g, "")}
+          </h2>
+        </div>
+      );
+    }
+
+    // Identifica subtítulos (linha que termina com : e tem menos de 80 caracteres)
+    if (trimmed.endsWith(":") && trimmed.length < 80 && !trimmed.includes(".")) {
+      return (
+        <h3
+          key={index}
+          className="text-lg font-semibold text-purple-700 mb-3 mt-5 first:mt-0"
+        >
+          {trimmed.replace(/:/g, "")}
+        </h3>
+      );
+    }
+
+    // Identifica listas (linhas que começam com -, •, ou números)
+    if (trimmed.match(/^[\-•]\s+/) || trimmed.match(/^\d+\.\s+/)) {
+      const items = trimmed
+        .split("\n")
+        .filter((line) => line.trim().match(/^[\-•\d]/));
+
+      return (
+        <div key={index} className="mb-4">
+          <ul className="space-y-2">
+            {items.map((item, i) => {
+              const cleanItem = item.replace(/^[\-•\d\.\s]+/, "").trim();
+              return (
+                <li key={i} className="flex items-start gap-3 text-gray-700 leading-relaxed">
+                  <span className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                  <span>{cleanItem}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    }
+
+    // Identifica citações bíblicas (contém nome de livro e números)
+    if (trimmed.match(/\b[A-ZÀ-Ù][a-zà-ù]+\s+\d+:\d+/)) {
+      return (
+        <blockquote
+          key={index}
+          className="border-l-4 border-green-400 bg-green-50 pl-4 py-3 my-4 italic text-gray-800 rounded-r-lg"
+        >
+          {trimmed}
+        </blockquote>
+      );
+    }
+
+    // Texto normal com formatação melhorada
+    return (
+      <div key={index} className="mb-4">
+        <p className="text-gray-800 leading-relaxed text-base">
+          {trimmed.split('\n').map((line, lineIndex) => (
+            <span key={lineIndex}>
+              {line.trim()}
+              {lineIndex < trimmed.split('\n').length - 1 && <br />}
+            </span>
+          ))}
+        </p>
+      </div>
+    );
+  });
+};
+
 interface VerseAnalysisProps {
   selectedVerses: Array<{
     verse: BibleVerse;
@@ -31,7 +128,7 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
 
     const analysisData = {
       id: Date.now().toString(),
-      title: `Estudo de ${selectedVerses.length} versículo${selectedVerses.length > 1 ? "s" : ""}`,
+      title: `Estudo de ${selectedVerses.length} versículo${selectedVerses.length > 1 ? 's' : ''}`,
       verses: selectedVerses.map(({ verse, book, chapter }) => ({
         text: verse.text,
         reference: `${book.name} ${chapter}:${verse.number}`,
@@ -41,9 +138,7 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
     };
 
     // Salvar no localStorage
-    const existingAnalyses = JSON.parse(
-      localStorage.getItem("saved_analyses") || "[]",
-    );
+    const existingAnalyses = JSON.parse(localStorage.getItem("saved_analyses") || "[]");
     existingAnalyses.unshift(analysisData); // Adiciona no início da lista
     localStorage.setItem("saved_analyses", JSON.stringify(existingAnalyses));
 
@@ -59,17 +154,14 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
     try {
       // Obter configurações salvas
       const apiKey = localStorage.getItem("gemini_api_key");
-      const customPrompt =
-        localStorage.getItem("gemini_custom_prompt") ||
+      const customPrompt = localStorage.getItem("gemini_custom_prompt") ||
         "Analise os versículos bíblicos fornecidos considerando contexto histórico, significado teológico e aplicação prática.";
 
-      const aiSettings = JSON.parse(
-        localStorage.getItem("ai_model_settings") || "{}",
-      );
+      const aiSettings = JSON.parse(localStorage.getItem("ai_model_settings") || "{}");
 
-      console.log("API Key presente:", !!apiKey);
-      console.log("Configurações AI:", aiSettings);
-      console.log("Prompt personalizado:", customPrompt);
+      console.log('API Key presente:', !!apiKey);
+      console.log('Configurações AI:', aiSettings);
+      console.log('Prompt personalizado:', customPrompt);
 
       // Preparar versículos para análise
       const versesText = selectedVerses
@@ -92,59 +184,44 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
         // Fazer chamada real para a API do Gemini
         try {
           // Corrigir o nome do modelo
-          const modelName =
-            aiSettings.model === "gemini-2.5-flash"
-              ? "gemini-1.5-flash"
-              : aiSettings.model === "gemini-1.5-pro"
-                ? "gemini-1.5-pro"
-                : aiSettings.model === "gemini-1.0-pro"
-                  ? "gemini-1.0-pro"
-                  : "gemini-1.5-flash";
+          const modelName = aiSettings.model === 'gemini-2.5-flash' ? 'gemini-1.5-flash' :
+                           aiSettings.model === 'gemini-1.5-pro' ? 'gemini-1.5-pro' :
+                           aiSettings.model === 'gemini-1.0-pro' ? 'gemini-1.0-pro' :
+                           'gemini-1.5-flash';
 
-          console.log("Fazendo chamada para Gemini API:", modelName);
+          console.log('Fazendo chamada para Gemini API:', modelName);
 
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      {
-                        text: fullPrompt,
-                      },
-                    ],
-                  },
-                ],
-                generationConfig: {
-                  temperature: aiSettings.temperature
-                    ? aiSettings.temperature[0]
-                    : 1,
-                  maxOutputTokens: 4096,
-                  topP: 0.95,
-                  topK: 64,
-                },
-              }),
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
             },
-          );
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: fullPrompt
+                }]
+              }],
+              generationConfig: {
+                temperature: aiSettings.temperature ? aiSettings.temperature[0] : 1,
+                maxOutputTokens: 4096,
+                topP: 0.95,
+                topK: 64,
+              }
+            })
+          });
 
-          console.log("Resposta da API:", response.status);
+          console.log('Resposta da API:', response.status);
 
           if (response.ok) {
             const data = await response.json();
-            console.log("Dados recebidos:", data);
+            console.log('Dados recebidos:', data);
 
-            const generatedText =
-              data.candidates?.[0]?.content?.parts?.[0]?.text;
+            const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (generatedText) {
-              // Remove asteriscos e formata o texto
-              const cleanAnalysis = generatedText.replace(/\*/g, "");
-              setAnalysis(cleanAnalysis);
+              // Salva o texto original para formatação posterior
+              setAnalysis(generatedText);
               setIsAnalyzing(false);
 
               toast({
@@ -152,6 +229,7 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
                 description: "Análise gerada com sucesso pelo Gemini.",
               });
               return;
+            }
             } else {
               throw new Error("Resposta vazia da API");
             }
@@ -169,8 +247,7 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
           } else if (apiError.message.includes("400")) {
             errorMessage = "Requisição inválida - verifique as configurações";
           } else if (apiError.message.includes("429")) {
-            errorMessage =
-              "Limite de uso excedido - tente novamente mais tarde";
+            errorMessage = "Limite de uso excedido - tente novamente mais tarde";
           } else if (apiError.message.includes("Failed to fetch")) {
             errorMessage = "Erro de conexão - verifique sua internet";
           }
@@ -185,8 +262,7 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
         // Sem API key válida
         toast({
           title: "API key necessária",
-          description:
-            "Configure uma chave da API do Gemini válida nas configurações.",
+          description: "Configure uma chave da API do Gemini válida nas configurações.",
           variant: "destructive",
         });
       }
@@ -227,10 +303,10 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
 
         toast({
           title: "Análise local concluída",
-          description:
-            "Configure a API do Gemini para análises mais detalhadas.",
+          description: "Configure a API do Gemini para análises mais detalhadas.",
         });
       }, 2000);
+
     } catch (error) {
       console.error("Erro na análise:", error);
       toast({
@@ -328,27 +404,22 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
               {/* Status das configurações */}
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="flex items-center gap-1">
-                  <div
-                    className={`w-2 h-2 rounded-full ${hasApiKey ? "bg-green-500" : "bg-red-500"}`}
-                  ></div>
+                  <div className={`w-2 h-2 rounded-full ${hasApiKey ? 'bg-green-500' : 'bg-red-500'}`}></div>
                   <span className="text-xs text-neutral-500">
-                    API Key {hasApiKey ? "✓" : "✗"}
+                    API Key {hasApiKey ? '✓' : '✗'}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div
-                    className={`w-2 h-2 rounded-full ${hasCustomPrompt ? "bg-green-500" : "bg-yellow-500"}`}
-                  ></div>
+                  <div className={`w-2 h-2 rounded-full ${hasCustomPrompt ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
                   <span className="text-xs text-neutral-500">
-                    Prompt {hasCustomPrompt ? "Personalizado" : "Padrão"}
+                    Prompt {hasCustomPrompt ? 'Personalizado' : 'Padrão'}
                   </span>
                 </div>
               </div>
 
               {!hasApiKey && (
                 <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-md mb-2">
-                  ⚠️ Configure sua API key do Gemini nas configurações para
-                  análises mais detalhadas
+                  ⚠️ Configure sua API key do Gemini nas configurações para análises mais detalhadas
                 </p>
               )}
             </div>
@@ -358,7 +429,7 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
               className="bg-blue-500 hover:bg-blue-600 text-white px-6"
             >
               <Send className="h-4 w-4 mr-2" />
-              {hasApiKey ? "Analisar com Gemini" : "Análise Local"}
+              {hasApiKey ? 'Analisar com Gemini' : 'Análise Local'}
             </Button>
           </div>
         )}
@@ -387,40 +458,51 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
 
         {analysis && (
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-neutral-600">
-              Análise Gerada
-            </h4>
-            <ScrollArea className="max-h-96 w-full">
-              <div className="prose prose-sm max-w-none">
-                <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200 text-neutral-700 whitespace-pre-line">
-                  {analysis}
+            <div className="flex items-center justify-between">
+              <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <Bot className="h-5 w-5 text-blue-600" />
+                Análise Gerada
+              </h4>
+              <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Gemini IA
+              </Badge>
+            </div>
+
+            <div className="max-h-[500px] overflow-y-auto">
+              <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 rounded-xl border border-blue-200 p-6 shadow-sm">
+                <div className="prose prose-lg max-w-none">
+                  <div className="font-serif leading-relaxed">
+                    {formatAnalysisText(analysis)}
+                  </div>
                 </div>
               </div>
-            </ScrollArea>
-            <div className="flex justify-end gap-2">
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
               <Button
-                variant="outline"
                 onClick={handleSaveAnalysis}
-                className="border-green-200 hover:bg-green-50 text-green-700"
+                className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
               >
                 <Save className="h-4 w-4 mr-2" />
-                Salvar
+                Salvar Análise
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setAnalysis("")}
-                className="border-neutral-200 hover:bg-sage-50"
+                className="border-gray-300 hover:bg-gray-50"
               >
                 Nova Análise
               </Button>
               <Button
                 variant="outline"
-                className="border-neutral-200 hover:bg-sage-50"
+                className="border-blue-300 hover:bg-blue-50 text-blue-700"
               >
                 Compartilhar
               </Button>
             </div>
           </div>
+        )}
         )}
       </CardContent>
     </Card>

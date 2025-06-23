@@ -42,50 +42,106 @@ const SavedAnalyses = () => {
   };
 
   const formatAnalysisText = (text: string) => {
-    // Remove asteriscos e formata o texto
-    let formatted = text.replace(/\*/g, "");
+    // Remove asteriscos, hashtags e tags markdown
+    let cleanText = text
+      .replace(/\*\*/g, "") // Remove **
+      .replace(/\*/g, "") // Remove *
+      .replace(/###/g, "") // Remove ###
+      .replace(/##/g, "") // Remove ##
+      .replace(/#/g, "") // Remove #
+      .replace(/\[.*?\]/g, "") // Remove tags [texto]
+      .replace(/<.*?>/g, "") // Remove tags HTML
+      .trim();
 
     // Quebra o texto em seções
-    const sections = formatted.split("\n\n");
+    const sections = cleanText.split(/\n\s*\n/);
 
     return sections.map((section, index) => {
       const trimmed = section.trim();
       if (!trimmed) return null;
 
-      // Identifica títulos (linhas que começam com **texto**)
-      if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
-        const title = trimmed.slice(2, -2);
+      // Identifica títulos principais (palavras em MAIÚSCULA ou títulos comuns)
+      if (
+        trimmed.match(/^[A-ZÀ-Ù\s]{3,}:?\s*$/) ||
+        trimmed.match(
+          /^(ANÁLISE|CONTEXTO|SIGNIFICADO|APLICAÇÃO|CONEXÕES|REFLEXÃO|VERSÍCULOS|CONCLUSÃO)/i,
+        )
+      ) {
+        return (
+          <div key={index} className="mb-4 first:mt-0">
+            <h2 className="text-lg font-bold text-blue-700 mb-2 pb-1 border-b border-blue-200">
+              {trimmed.replace(/:/g, "")}
+            </h2>
+          </div>
+        );
+      }
+
+      // Identifica subtítulos (linha que termina com : e tem menos de 80 caracteres)
+      if (
+        trimmed.endsWith(":") &&
+        trimmed.length < 80 &&
+        !trimmed.includes(".")
+      ) {
         return (
           <h3
             key={index}
-            className="text-lg font-semibold text-blue-700 mb-3 mt-4 first:mt-0"
+            className="text-base font-semibold text-purple-700 mb-2 mt-3 first:mt-0"
           >
-            {title}
+            {trimmed.replace(/:/g, "")}
           </h3>
         );
       }
 
-      // Identifica listas (linhas que começam com -)
-      if (trimmed.includes("- ")) {
+      // Identifica listas (linhas que começam com -, •, ou números)
+      if (trimmed.match(/^[\-•]\s+/) || trimmed.match(/^\d+\.\s+/)) {
         const items = trimmed
           .split("\n")
-          .filter((line) => line.trim().startsWith("- "));
+          .filter((line) => line.trim().match(/^[\-•\d]/));
+
         return (
-          <ul key={index} className="list-disc list-inside space-y-1 mb-3">
-            {items.map((item, i) => (
-              <li key={i} className="text-neutral-700">
-                {item.replace("- ", "")}
-              </li>
-            ))}
-          </ul>
+          <div key={index} className="mb-3">
+            <ul className="space-y-1">
+              {items.map((item, i) => {
+                const cleanItem = item.replace(/^[\-•\d\.\s]+/, "").trim();
+                return (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 text-gray-700 text-sm leading-relaxed"
+                  >
+                    <span className="flex-shrink-0 w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></span>
+                    <span>{cleanItem}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      }
+
+      // Identifica citações bíblicas (contém nome de livro e números)
+      if (trimmed.match(/\b[A-ZÀ-Ù][a-zà-ù]+\s+\d+:\d+/)) {
+        return (
+          <blockquote
+            key={index}
+            className="border-l-3 border-green-400 bg-green-50 pl-3 py-2 my-3 italic text-gray-800 text-sm rounded-r-md"
+          >
+            {trimmed}
+          </blockquote>
         );
       }
 
       // Texto normal
       return (
-        <p key={index} className="text-neutral-700 leading-relaxed mb-3">
-          {trimmed}
-        </p>
+        <div key={index} className="mb-3">
+          <p className="text-gray-800 leading-relaxed text-sm">
+            {trimmed.split("\n").map((line, lineIndex) => (
+              <span key={lineIndex}>
+                {line.trim()}
+                {lineIndex < trimmed.split("\n").length - 1 && <br />}
+              </span>
+            ))}
+          </p>
+        </div>
       );
     });
   };
@@ -213,9 +269,11 @@ const SavedAnalyses = () => {
                     {/* Analysis Content */}
                     <div className="pt-4 border-t border-neutral-200">
                       <div className="w-full">
-                        <div className="prose prose-sm max-w-none">
-                          <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                            {formatAnalysisText(analysis.analysis)}
+                        <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 rounded-lg border border-blue-200 p-4 shadow-sm">
+                          <div className="prose prose-sm max-w-none">
+                            <div className="font-serif leading-relaxed">
+                              {formatAnalysisText(analysis.analysis)}
+                            </div>
                           </div>
                         </div>
                       </div>
