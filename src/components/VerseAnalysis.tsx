@@ -86,8 +86,20 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
       if (apiKey && apiKey.trim()) {
         // Fazer chamada real para a API do Gemini
         try {
+          // Corrigir o nome do modelo
+          const modelName =
+            aiSettings.model === "gemini-2.5-flash"
+              ? "gemini-1.5-flash"
+              : aiSettings.model === "gemini-1.5-pro"
+                ? "gemini-1.5-pro"
+                : aiSettings.model === "gemini-1.0-pro"
+                  ? "gemini-1.0-pro"
+                  : "gemini-1.5-flash";
+
+          console.log("Fazendo chamada para Gemini API:", modelName);
+
           const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${aiSettings.model || "gemini-2.5-flash"}:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
             {
               method: "POST",
               headers: {
@@ -107,32 +119,47 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
                   temperature: aiSettings.temperature
                     ? aiSettings.temperature[0]
                     : 1,
-                  maxOutputTokens: 2048,
+                  maxOutputTokens: 4096,
+                  topP: 0.95,
+                  topK: 64,
                 },
               }),
             },
           );
 
+          console.log("Resposta da API:", response.status);
+
           if (response.ok) {
             const data = await response.json();
-            const generatedText =
-              data.candidates?.[0]?.content?.parts?.[0]?.text ||
-              "Não foi possível gerar a análise.";
+            console.log("Dados recebidos:", data);
 
-            // Remove asteriscos e formata o texto
-            const cleanAnalysis = generatedText.replace(/\*/g, "");
-            setAnalysis(cleanAnalysis);
-            setIsAnalyzing(false);
-            return;
+            const generatedText =
+              data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (generatedText) {
+              // Remove asteriscos e formata o texto
+              const cleanAnalysis = generatedText.replace(/\*/g, "");
+              setAnalysis(cleanAnalysis);
+              setIsAnalyzing(false);
+
+              toast({
+                title: "Análise concluída!",
+                description: "Análise gerada com sucesso pelo Gemini.",
+              });
+              return;
+            } else {
+              throw new Error("Resposta vazia da API");
+            }
           } else {
-            throw new Error(`Erro da API: ${response.status}`);
+            const errorData = await response.text();
+            console.error("Erro da API:", response.status, errorData);
+            throw new Error(`Erro da API: ${response.status} - ${errorData}`);
           }
         } catch (apiError) {
           console.error("Erro na API do Gemini:", apiError);
           toast({
-            title: "Erro na API",
-            description:
-              "Não foi possível conectar com o Gemini. Usando análise local.",
+            title: "Erro na API do Gemini",
+            description: `${apiError.message}. Verifique sua chave da API.`,
             variant: "destructive",
           });
         }
@@ -140,27 +167,43 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
 
       // Fallback: Análise local melhorada baseada no prompt personalizado
       setTimeout(() => {
-        const analysisTemplate = `Análise dos Versículos Selecionados
+        const analysisTemplate = `ANÁLISE BÍBLICA LOCAL
 
-Versículos Analisados:
+VERSÍCULOS ANALISADOS:
 ${versesText}
 
-Baseado no prompt personalizado: "${customPrompt}"
+PROMPT UTILIZADO:
+"${customPrompt}"
 
-Esta análise foi gerada localmente pois não foi possível conectar com a API do Gemini.
-Para obter análises mais detalhadas e personalizadas, verifique:
-- Se sua chave da API está correta nas configurações
-- Se você tem conexão com a internet
-- Se as configurações do modelo estão adequadas
+ANÁLISE:
 
-Análise básica dos versículos:
-Os versículos selecionados contêm ensinamentos importantes que podem ser aplicados em nossa vida diária.
-Cada passagem carrega significado teológico e histórico que merece reflexão cuidadosa.
+Contexto Histórico:
+Os versículos selecionados fazem parte do rico contexto das Escrituras Sagradas, cada um carregando significado profundo em seu ambiente histórico e cultural.
 
-Configure sua chave da API do Gemini nas configurações para análises mais profundas e personalizadas.`;
+Significado Teológico:
+Estas passagens revelam aspectos fundamentais da relação entre Deus e a humanidade, apresentando verdades eternas que transcendem o tempo.
+
+Aplicação Prática:
+Para nossa vida hoje, estes versículos nos convidam à reflexão sobre como podemos viver de acordo com os princípios bíblicos, aplicando seus ensinamentos em nosso cotidiano.
+
+OBSERVAÇÃO:
+Esta é uma análise básica gerada localmente. Para análises mais detalhadas e personalizadas com IA:
+
+1. Vá em Configurações (menu)
+2. Configure sua chave da API do Gemini
+3. Personalize seu prompt de análise
+4. Tente novamente
+
+A integração com Gemini proporcionará análises muito mais profundas e contextualizadas conforme seu prompt personalizado.`;
 
         setAnalysis(analysisTemplate);
         setIsAnalyzing(false);
+
+        toast({
+          title: "Análise local concluída",
+          description:
+            "Configure a API do Gemini para análises mais detalhadas.",
+        });
       }, 2000);
     } catch (error) {
       console.error("Erro na análise:", error);
