@@ -9,12 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [apiKey, setApiKey] = useState("");
   const [customPrompt, setCustomPrompt] = useState("");
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [hasCustomPrompt, setHasCustomPrompt] = useState(false);
   const { toast } = useToast();
 
   const handleBack = () => {
@@ -26,9 +29,14 @@ const Settings = () => {
     const savedApiKey = localStorage.getItem("gemini_api_key");
     const savedPrompt = localStorage.getItem("gemini_custom_prompt");
 
-    if (savedApiKey) setApiKey(savedApiKey);
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+      setHasApiKey(true);
+    }
+
     if (savedPrompt) {
       setCustomPrompt(savedPrompt);
+      setHasCustomPrompt(true);
     } else {
       // Prompt padrão para análise bíblica
       setCustomPrompt(
@@ -43,22 +51,38 @@ const Settings = () => {
   }, []);
 
   const handleSave = () => {
-    if (!apiKey.trim()) {
+    if (!apiKey.trim() && !customPrompt.trim()) {
       toast({
-        title: "Erro",
-        description: "Por favor, insira uma chave de API válida.",
+        title: "Aviso",
+        description: "Adicione pelo menos uma configuração para salvar.",
         variant: "destructive",
       });
       return;
     }
 
     // Salvar configurações no localStorage
-    localStorage.setItem("gemini_api_key", apiKey);
-    localStorage.setItem("gemini_custom_prompt", customPrompt);
+    if (apiKey.trim()) {
+      localStorage.setItem("gemini_api_key", apiKey);
+      setHasApiKey(true);
+    }
+
+    if (customPrompt.trim()) {
+      localStorage.setItem("gemini_custom_prompt", customPrompt);
+      setHasCustomPrompt(true);
+    }
+
+    // Feedback detalhado sobre o que foi salvo
+    let message = "Configurações salvas: ";
+    const saved = [];
+
+    if (apiKey.trim()) saved.push("Chave da API");
+    if (customPrompt.trim()) saved.push("Prompt personalizado");
+
+    message += saved.join(" e ");
 
     toast({
       title: "Sucesso",
-      description: "Configurações salvas com sucesso!",
+      description: message,
     });
   };
 
@@ -111,9 +135,19 @@ const Settings = () => {
                 <div className="p-1.5 bg-blue-100 rounded-md">
                   <Key className="h-4 w-4 text-blue-600" />
                 </div>
-                <h2 className="text-lg font-medium text-neutral-700">
-                  Configuração da API
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-medium text-neutral-700">
+                    Configuração da API
+                  </h2>
+                  {hasApiKey && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-700 text-xs"
+                    >
+                      ✓ Salva
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -160,9 +194,19 @@ const Settings = () => {
                 <div className="p-1.5 bg-purple-100 rounded-md">
                   <MessageSquare className="h-4 w-4 text-purple-600" />
                 </div>
-                <h2 className="text-lg font-medium text-neutral-700">
-                  Prompt Personalizado
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-medium text-neutral-700">
+                    Prompt Personalizado
+                  </h2>
+                  {hasCustomPrompt && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-700 text-xs"
+                    >
+                      ✓ Salvo
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
