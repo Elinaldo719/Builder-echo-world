@@ -86,6 +86,48 @@ const Settings = () => {
     });
   };
 
+  const handleSaveAll = () => {
+    // Salvar API key e prompt
+    if (apiKey.trim()) {
+      localStorage.setItem("gemini_api_key", apiKey);
+      setHasApiKey(true);
+    }
+
+    if (customPrompt.trim()) {
+      localStorage.setItem("gemini_custom_prompt", customPrompt);
+      setHasCustomPrompt(true);
+    }
+
+    // Salvar configurações do modelo IA também
+    const aiSettings = JSON.parse(
+      localStorage.getItem("ai_model_settings") || "{}",
+    );
+
+    // Atualizar timestamp das configurações
+    const allSettings = {
+      apiKey: apiKey || "",
+      customPrompt: customPrompt || "",
+      aiModelSettings: aiSettings,
+      savedAt: new Date().toISOString(),
+    };
+
+    try {
+      localStorage.setItem("all_app_settings", JSON.stringify(allSettings));
+
+      toast({
+        title: "Todas as configurações salvas!",
+        description:
+          "API key, prompt personalizado e configurações do modelo IA foram salvos com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar todas as configurações.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleTestConnection = () => {
     // Simular teste de conexão
     if (apiKey.trim()) {
@@ -232,15 +274,46 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          {/* Save Button */}
-          <div className="flex justify-end">
+          {/* Save All Button */}
+          <div className="flex flex-col gap-3">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-neutral-700 mb-2">
+                Salvar Todas as Configurações
+              </h3>
+              <p className="text-sm text-neutral-500 mb-4">
+                Salva a chave da API, prompt personalizado e todas as
+                configurações do modelo IA
+              </p>
+            </div>
+
             <Button
-              onClick={handleSave}
-              className="bg-sage-500 hover:bg-sage-600 text-white px-6"
+              onClick={handleSaveAll}
+              className="w-full bg-gradient-to-r from-sage-500 to-blue-500 hover:from-sage-600 hover:to-blue-600 text-white py-3 text-lg font-semibold shadow-lg"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Salvar Configurações
+              <Save className="h-5 w-5 mr-3" />
+              Salvar Todas as Configurações
             </Button>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSave}
+                variant="outline"
+                className="flex-1 border-sage-200 hover:bg-sage-50 text-sage-700"
+              >
+                Salvar API e Prompt
+              </Button>
+              <Button
+                onClick={() => {
+                  // Trigger save from AISettings component
+                  const event = new CustomEvent("saveAISettings");
+                  window.dispatchEvent(event);
+                }}
+                variant="outline"
+                className="flex-1 border-blue-200 hover:bg-blue-50 text-blue-700"
+              >
+                Salvar Modelo IA
+              </Button>
+            </div>
           </div>
         </div>
       </div>

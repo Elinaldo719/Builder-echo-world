@@ -59,7 +59,29 @@ const AISettings = ({ onClose }: AISettingsProps) => {
         console.error("Erro ao carregar configurações da IA:", error);
       }
     }
-  }, []);
+
+    // Listen for save event from Settings page
+    const handleSaveEvent = () => {
+      handleSave();
+    };
+
+    window.addEventListener("saveAISettings", handleSaveEvent);
+
+    return () => {
+      window.removeEventListener("saveAISettings", handleSaveEvent);
+    };
+  }, [
+    model,
+    temperature,
+    thinkingMode,
+    thinkingBudget,
+    structuredOutput,
+    codeExecution,
+    functionCalling,
+    googleSearch,
+    urlContext,
+    toast,
+  ]);
 
   // Função para salvar configurações
   const handleSave = () => {
@@ -79,7 +101,7 @@ const AISettings = ({ onClose }: AISettingsProps) => {
     try {
       localStorage.setItem("ai_model_settings", JSON.stringify(settings));
       toast({
-        title: "Configurações salvas!",
+        title: "Configurações IA salvas!",
         description: `Modelo ${model} e configurações foram salvos com sucesso.`,
       });
     } catch (error) {
