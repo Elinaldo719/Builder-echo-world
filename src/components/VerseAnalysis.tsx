@@ -229,7 +229,6 @@ Por favor, forneça uma análise detalhada e bem estruturada destes versículos.
                 description: "Análise gerada com sucesso pelo Gemini.",
               });
               return;
-            }
             } else {
               throw new Error("Resposta vazia da API");
             }
