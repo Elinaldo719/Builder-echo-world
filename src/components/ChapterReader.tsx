@@ -12,7 +12,6 @@ import {
 import { BibleBook } from "@/types/bible";
 import { bibleApi } from "@/lib/bible-api";
 import VerseCard from "./VerseCard";
-import AIHelper from "./AIHelper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -122,13 +121,6 @@ const ChapterReader = ({
           </div>
         </CardHeader>
       </Card>
-
-      {/* AI Helper */}
-      <AIHelper
-        currentVerse={chapterData?.verses?.[0]?.text}
-        currentBook={book.name}
-        chapter={currentChapter}
-      />
 
       {/* Verses */}
       <div className="space-y-3">
