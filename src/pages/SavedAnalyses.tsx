@@ -94,7 +94,7 @@ const SavedAnalyses = () => {
     <div className="min-h-screen modern-gradient">
       <BibleHeader onMenuClick={handleBack} hideMenuButton={true} />
 
-      <div className="px-6 py-8 max-w-4xl mx-auto">
+      <div className="px-6 py-8 pb-24 max-w-4xl mx-auto">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-4">
@@ -136,7 +136,7 @@ const SavedAnalyses = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-8">
               {analyses.map((analysis) => (
                 <Card
                   key={analysis.id}
@@ -212,13 +212,13 @@ const SavedAnalyses = () => {
 
                     {/* Analysis Content */}
                     <div className="pt-4 border-t border-neutral-200">
-                      <ScrollArea className="max-h-96 w-full">
+                      <div className="w-full">
                         <div className="prose prose-sm max-w-none">
                           <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200">
                             {formatAnalysisText(analysis.analysis)}
                           </div>
                         </div>
-                      </ScrollArea>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
