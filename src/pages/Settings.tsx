@@ -166,7 +166,7 @@ const Settings = () => {
           </div>
 
           {/* AI Model Settings */}
-          <div className="flex justify-center">
+          <div className="w-full">
             <AISettings />
           </div>
 

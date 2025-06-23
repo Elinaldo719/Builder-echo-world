@@ -348,7 +348,7 @@ A integração com Gemini proporcionará análises muito mais profundas e contex
   };
 
   return (
-    <Card className="w-full bg-white/95 backdrop-blur-sm border-neutral-200/50 shadow-lg">
+    <Card className="w-full max-w-none bg-white/95 backdrop-blur-sm border-neutral-200/50 shadow-lg">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
