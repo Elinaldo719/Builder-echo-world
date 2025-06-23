@@ -13,7 +13,7 @@ const BibleHeader = ({
   hideMenuButton,
 }: BibleHeaderProps) => {
   return (
-    <header className="subtle-gradient text-neutral-700 px-6 py-5 border-b border-neutral-200/50">
+    <header className="subtle-gradient text-neutral-700 px-2 sm:px-4 lg:px-6 py-5 border-b border-neutral-200/50">
       <div className="flex items-center justify-between max-w-none mx-auto px-2">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white/70 rounded-lg shadow-sm">

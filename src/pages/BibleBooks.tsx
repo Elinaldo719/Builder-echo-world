@@ -11,7 +11,7 @@ const BibleBooks = ({ onBookSelect, onRandomVerse }: BibleBooksProps) => {
   return (
     <div className="min-h-screen modern-gradient">
       <BibleHeader onRandomVerse={onRandomVerse} />
-      <div className="px-4 py-8 max-w-none mx-auto">
+      <div className="px-2 sm:px-4 lg:px-6 py-8 max-w-none mx-auto">
         <BooksList onBookSelect={onBookSelect} />
       </div>
     </div>
