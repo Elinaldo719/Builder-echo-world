@@ -22,6 +22,10 @@ const VerseAnalysis = ({ selectedVerses, onClose }: VerseAnalysisProps) => {
   const [analysis, setAnalysis] = useState<string>("");
   const { toast } = useToast();
 
+  // Verificar configurações da API
+  const hasApiKey = localStorage.getItem("gemini_api_key");
+  const hasCustomPrompt = localStorage.getItem("gemini_custom_prompt");
+
   const handleSaveAnalysis = () => {
     if (!analysis) return;
 
@@ -246,16 +250,46 @@ Configure sua chave da API do Gemini nas configurações para análises mais pro
         {/* Analysis Section */}
         {!analysis && !isAnalyzing && (
           <div className="text-center py-6">
-            <p className="text-sm text-neutral-600 mb-4">
-              Clique no botão abaixo para gerar uma análise detalhada dos
-              versículos selecionados.
-            </p>
+            <div className="mb-4">
+              <p className="text-sm text-neutral-600 mb-2">
+                Clique no botão abaixo para gerar uma análise detalhada dos
+                versículos selecionados.
+              </p>
+
+              {/* Status das configurações */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="flex items-center gap-1">
+                  <div
+                    className={`w-2 h-2 rounded-full ${hasApiKey ? "bg-green-500" : "bg-red-500"}`}
+                  ></div>
+                  <span className="text-xs text-neutral-500">
+                    API Key {hasApiKey ? "✓" : "✗"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div
+                    className={`w-2 h-2 rounded-full ${hasCustomPrompt ? "bg-green-500" : "bg-yellow-500"}`}
+                  ></div>
+                  <span className="text-xs text-neutral-500">
+                    Prompt {hasCustomPrompt ? "Personalizado" : "Padrão"}
+                  </span>
+                </div>
+              </div>
+
+              {!hasApiKey && (
+                <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-md mb-2">
+                  ⚠️ Configure sua API key do Gemini nas configurações para
+                  análises mais detalhadas
+                </p>
+              )}
+            </div>
+
             <Button
               onClick={handleAnalyze}
               className="bg-blue-500 hover:bg-blue-600 text-white px-6"
             >
               <Send className="h-4 w-4 mr-2" />
-              Analisar Versículos
+              {hasApiKey ? "Analisar com Gemini" : "Análise Local"}
             </Button>
           </div>
         )}
