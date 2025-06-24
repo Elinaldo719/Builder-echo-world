@@ -8,6 +8,8 @@ import BibleBooks from "./pages/BibleBooks";
 import Settings from "./pages/Settings";
 import SavedAnalyses from "./pages/SavedAnalyses";
 import NotFound from "./pages/NotFound";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWAStatus from "./components/PWAStatus";
 
 const queryClient = new QueryClient({
   defaultOptions: {
