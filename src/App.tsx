@@ -38,6 +38,7 @@ const App = () => (
         {/* PWA Components */}
         <PWAInstallPrompt />
         <PWAStatus />
+        <PWANotifications />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
