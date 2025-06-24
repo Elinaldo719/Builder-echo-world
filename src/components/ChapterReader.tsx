@@ -123,7 +123,7 @@ const ChapterReader = ({
       </Card>
 
       {/* Verses */}
-      <div className="space-y-3">
+      <div className="space-y-1">
         {isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
               <Skeleton key={i} className="h-24 w-full rounded-lg" />
