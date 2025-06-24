@@ -50,6 +50,8 @@ const AISettings = ({ onClose }: AISettingsProps) => {
         const settings = JSON.parse(savedSettings);
         setModel(settings.model || "gemini-2.5-flash");
         setTemperature(settings.temperature || [1]);
+        setOutputLength(settings.outputLength || 65536);
+        setTopP(settings.topP || [0.95]);
         setThinkingMode(settings.thinkingMode ?? true);
         setThinkingBudget(settings.thinkingBudget ?? false);
         setStructuredOutput(settings.structuredOutput ?? false);
