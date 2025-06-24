@@ -192,6 +192,39 @@ const AISettings = ({ onClose }: AISettingsProps) => {
           />
         </div>
 
+        {/* Output length */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-neutral-600">
+            Output length
+          </span>
+          <div className="w-20 h-8 bg-white border border-neutral-200 rounded-md flex items-center justify-center">
+            <input
+              type="number"
+              value={outputLength}
+              onChange={(e) => setOutputLength(Number(e.target.value))}
+              className="w-full h-full text-sm text-neutral-700 text-center bg-transparent border-none outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Top P */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-neutral-600">Top P</span>
+            <div className="w-12 h-8 bg-white border border-neutral-200 rounded-md flex items-center justify-center">
+              <span className="text-sm text-neutral-700">{topP[0]}</span>
+            </div>
+          </div>
+          <Slider
+            value={topP}
+            onValueChange={setTopP}
+            max={1}
+            min={0}
+            step={0.01}
+            className="w-full"
+          />
+        </div>
+
         <Separator className="my-4" />
 
         {/* Thinking Section */}
