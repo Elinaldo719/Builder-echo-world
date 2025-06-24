@@ -77,6 +77,8 @@ const AISettings = ({ onClose }: AISettingsProps) => {
   }, [
     model,
     temperature,
+    outputLength,
+    topP,
     thinkingMode,
     thinkingBudget,
     structuredOutput,
