@@ -2,6 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* PWA Styles */
+@layer base {
+  /* Prevent pull-to-refresh on mobile */
+  html,
+  body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* PWA safe areas */
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Prevent zoom on inputs on iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* PWA specific styles for standalone mode */
+  @media (display-mode: standalone) {
+    body {
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Hide scrollbars in standalone mode */
+    ::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
+  }
+
+  /* Improve touch targets */
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Smooth scrolling */
+  * {
+    scroll-behavior: smooth;
+  }
+
+  /* High contrast for better accessibility */
+  @media (prefers-contrast: high) {
+    :root {
+      --sage-300: 120 30% 70%;
+      --sage-400: 120 40% 50%;
+      --sage-500: 120 50% 30%;
+      --sage-600: 120 60% 20%;
+    }
+  }
+
+  /* Dark mode improvements for PWA */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 220 13% 9%;
+      --foreground: 220 13% 91%;
+      --card: 220 13% 9%;
+      --card-foreground: 220 13% 91%;
+    }
+  }
+}
+
 @layer base {
   /**
    * Tailwind CSS theme
