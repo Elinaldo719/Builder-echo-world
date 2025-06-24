@@ -29,6 +29,8 @@ interface AISettingsProps {
 const AISettings = ({ onClose }: AISettingsProps) => {
   const [model, setModel] = useState("gemini-2.5-flash");
   const [temperature, setTemperature] = useState([1]);
+  const [outputLength, setOutputLength] = useState(65536);
+  const [topP, setTopP] = useState([0.95]);
   const [thinkingMode, setThinkingMode] = useState(true);
   const [thinkingBudget, setThinkingBudget] = useState(false);
   const [structuredOutput, setStructuredOutput] = useState(false);
@@ -115,7 +117,7 @@ const AISettings = ({ onClose }: AISettingsProps) => {
 
   return (
     <Card className="w-full max-w-none bg-white/95 backdrop-blur-sm border-neutral-200/50 shadow-lg">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-2 px-2 pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-sage-100 rounded-md">
@@ -136,7 +138,7 @@ const AISettings = ({ onClose }: AISettingsProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 px-2 pb-2">
         {/* Model Selection */}
         <div className="space-y-3">
           <Select value={model} onValueChange={setModel}>
