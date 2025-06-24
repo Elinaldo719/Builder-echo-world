@@ -10,6 +10,7 @@ import SavedAnalyses from "./pages/SavedAnalyses";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAStatus from "./components/PWAStatus";
+import PWANotifications from "./components/PWANotifications";
 
 const queryClient = new QueryClient({
   defaultOptions: {
