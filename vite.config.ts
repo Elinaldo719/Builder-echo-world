@@ -13,37 +13,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/www\.abibliadigital\.com\.br\/api\/.*/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "bible-api-cache",
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24, // 24 hours
-              },
-              cacheKeyWillBeUsed: async ({ request }) => {
-                return `${request.url}?timestamp=${Math.floor(Date.now() / (1000 * 60 * 60))}`;
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "google-fonts-cache",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-              },
-            },
-          },
-        ],
-      },
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
+      includeAssets: ["favicon.ico", "apple-touch-icon.png"],
       manifest: {
         name: "Verso Diário - Bíblia",
         short_name: "Verso Diário",
@@ -98,9 +68,11 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+      },
       devOptions: {
-        enabled: mode === "development",
-        type: "module",
+        enabled: false,
       },
     }),
   ],
